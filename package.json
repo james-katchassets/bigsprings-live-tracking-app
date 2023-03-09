@@ -24,6 +24,8 @@
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-svelte3": "^4.0.0",
 		"i": "^0.3.7",
+		"mapbox-gl": "^2.13.0",
+		"moment": "^2.29.4",
 		"npm": "^9.6.0",
 		"prettier": "^2.8.0",
 		"prettier-plugin-svelte": "^2.8.1",
