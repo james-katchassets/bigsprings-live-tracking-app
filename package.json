@@ -16,6 +16,7 @@
 		"@aws-sdk/credential-providers": "^3.282.0",
 		"@aws-sdk/lib-dynamodb": "^3.284.0",
 		"@sveltejs/adapter-auto": "^2.0.0",
+		"@sveltejs/adapter-vercel": "^2.3.1",
 		"@sveltejs/kit": "^1.5.0",
 		"@types/node": "^18.14.6",
 		"carbon-components-svelte": "^0.73.2",

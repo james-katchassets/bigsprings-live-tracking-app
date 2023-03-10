@@ -64,7 +64,7 @@
 			}
 		};
 
-		data.logs.forEach((log) =>
+		data.logs.forEach((/** @type any */ log) =>
 			routedata.data.features.push({
 				type: 'Feature',
         properties: {
@@ -121,7 +121,7 @@
 			closeOnClick: true
 		});
 
-		map.on('mouseenter', 'locations', (e) => {
+		map.on('mouseenter', 'locations', (/** @type any */  e) => {
 			map.getCanvas().style.cursor = 'pointer';
 			const coordinates = e.features[0].geometry.coordinates.slice();
 			const description = e.features[0].properties.description;
