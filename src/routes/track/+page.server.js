@@ -1,4 +1,4 @@
-import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } from '$env/static/private';
+import { MY_AWS_ACCESS_KEY_ID, MY_AWS_SECRET_ACCESS_KEY } from '$env/static/private';
 import { ddbClient } from '$lib/ddbclient';
 import moment from 'moment';
 import { QueryCommand } from '@aws-sdk/lib-dynamodb';
@@ -6,8 +6,8 @@ import { QueryCommand } from '@aws-sdk/lib-dynamodb';
 /** @type {import('./$types').PageServerLoad} */
 export const load = ({ locals }) => {
 	const cred = {
-		accessKeyId: AWS_ACCESS_KEY_ID,
-		secretAccessKey: AWS_SECRET_ACCESS_KEY
+		accessKeyId: MY_AWS_ACCESS_KEY_ID,
+		secretAccessKey: MY_AWS_SECRET_ACCESS_KEY
 	};
 
 	const client = ddbClient;
