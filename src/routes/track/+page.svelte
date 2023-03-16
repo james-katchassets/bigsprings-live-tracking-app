@@ -147,12 +147,12 @@
 <Grid>
 	<Row>
 		<Column>
-			<div id="map" style="min-height:500px;width:100%;" />
+			<div id="map" style="min-height:500px;min-width:600px;" />
 		</Column>
 	</Row>
 	<Row>
-		<Column
-			><DataTable
+		<Column>
+			<DataTable
 				title="Travel Logs"
 				sortable
 				headers={[
