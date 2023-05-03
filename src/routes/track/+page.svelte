@@ -1,4 +1,7 @@
 <script>
+	// /** @type { import("./$types").PageData }*/
+	// export let data;
+
 	import { Column, DataTable, Grid, Pagination, Row } from 'carbon-components-svelte';
 	import moment from 'moment';
 	import mapboxgl from 'mapbox-gl';
@@ -10,8 +13,8 @@
 	let /** @type number */ pageSize = 20;
 	let /** @type number */ page = 1;
 	let /** @type number[] */ center =
-			data.logs.length > 0
-				? [data.logs[data.logs.length - 1].lng, data.logs[data.logs.length - 1].lat]
+			data.scan_logs.length > 0
+				? [data.scan_logs[0].location.lng, data.scan_logs[0].location.lat]
 				: [151.21513681183322, -33.875958176445934];
 
 	let /** @type number | undefined */ minX = undefined;
@@ -30,19 +33,22 @@
 
 		const /** @type number[][] */ coordinates = new Array();
 
-		for (var i = 0; i < data.logs.length; i++) {
-			coordinates.push([data.logs[i].lng, data.logs[i].lat]);
-			if (!minX || minX > data.logs[i].lng) {
-				minX = data.logs[i].lng;
+		for (var i = 0; i < data.scan_logs.length; i++) {
+			if (data.scan_logs[i].location === null) {
+				continue;
 			}
-			if (!minY || minY > data.logs[i].lat) {
-				minY = data.logs[i].lat;
+			coordinates.push([data.scan_logs[i].location.lng, data.scan_logs[i].location.lat]);
+			if (!minX || minX > data.scan_logs[i].location.lng) {
+				minX = data.scan_logs[i].location.lng;
 			}
-			if (!maxX || maxX < data.logs[i].lng) {
-				maxX = data.logs[i].lng;
+			if (!minY || minY > data.scan_logs[i].location.lat) {
+				minY = data.scan_logs[i].location.lat;
 			}
-			if (!maxY || maxY < data.logs[i].lat) {
-				maxY = data.logs[i].lat;
+			if (!maxX || maxX < data.scan_logs[i].location.lng) {
+				maxX = data.scan_logs[i].location.lng;
+			}
+			if (!maxY || maxY < data.scan_logs[i].location.lat) {
+				maxY = data.scan_logs[i].location.lat;
 			}
 		}
 		const routedata = {
@@ -62,25 +68,23 @@
 			}
 		};
 
-		data.logs.forEach((/** @type any */ log) =>
-			routedata.data.features.push({
-				type: 'Feature',
-				properties: {
-					description:
-						moment(log.timestamp_msec).format() +
-						'<br/>Coordinates: [' +
-						log.lat +
-						',' +
-						log.lng +
-						']</br>',
-					speed: log.speed
-				},
-				geometry: {
-					type: 'Point',
-					coordinates: [log.lng, log.lat]
-				}
-			})
-		);
+		data.scan_logs.forEach((/** @type any */ log) => {
+			if (log.location != null) {
+				const desc = `Timestamp: ${moment.parseZone(log.timestamp, "YYYY-MM-DDTHH:mm:ssZ").local().format("YYYY-MM-DD HH:mm:ss ZZ")} ${log.location === null ? '--'
+								: '<br/>Coordinates: [' + log.location.lat + ',' + log.location.lng + ']</br>'}`
+				routedata.data.features.push({
+					type: 'Feature',
+					properties: {
+						description: desc
+							
+					},
+					geometry: {
+						type: 'Point',
+						coordinates: [log.location.lng, log.location.lat]
+					}
+				});
+			}
+		});
 
 		map.on('load', () => {
 			map.addSource('route', routedata);
@@ -101,10 +105,10 @@
 				id: 'locations',
 				type: 'circle',
 				source: 'route',
-				paint: {
-					'circle-color': ['case', ['==', ['get', 'speed'], 0], '#ff0000', '#00ff00'],
-					'circle-radius': 6
-				},
+				// paint: {
+				// 	'circle-color': ['case', ['==', ['get', 'speed'], 0], '#ff0000', '#00ff00'],
+				// 	'circle-radius': 6
+				// },
 				filter: ['==', '$type', 'Point']
 			});
 		});
@@ -150,7 +154,7 @@
 			<div id="map" style="min-height:500px;min-width:600px;" />
 		</Column>
 	</Row>
-	<Row>
+	<!-- <Row>
 		<Column>
 			<DataTable
 				title="Travel Logs"
@@ -178,5 +182,5 @@
 				pageSizeInputDisabled
 			/></Column
 		>
-	</Row>
+	</Row> -->
 </Grid>
