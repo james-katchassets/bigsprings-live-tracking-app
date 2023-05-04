@@ -33,11 +33,5 @@
   </SideNavItems>
 </SideNav>
 <Content>
-  <Grid>
-    <Row>
-      <Column>
-        <slot/>
-      </Column>
-    </Row>
-  </Grid>
+  <slot/>
 </Content>

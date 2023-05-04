@@ -162,7 +162,7 @@
 	}
 </script>
 
-<Grid>
+<Grid narrow>
 	<Row>
 		<Column>
 			<div id="map" style="min-height:500px;min-width:600px;" />
