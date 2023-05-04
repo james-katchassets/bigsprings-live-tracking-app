@@ -10,6 +10,9 @@
     Grid,
     Row,
     Column,
+	SideNav,
+	SideNavItems,
+	SideNavLink,
   } from "carbon-components-svelte";
 
   let isSideNavOpen = false;
@@ -19,11 +22,16 @@
   <svelte:fragment slot="skip-to-content">
     <SkipToContent />
   </svelte:fragment>
-  <HeaderNav>
-    <HeaderNavItem href="/track" text="Track" />
-  </HeaderNav>
 </Header>
-
+<SideNav bind:isOpen={isSideNavOpen}>
+  <SideNavItems>
+    <SideNavLink text="e89f6de809f4" href="/track/e89f6de809f4" />
+    <SideNavLink text="e89f6de809f8" href="/track/e89f6de809f8" />
+    <SideNavLink text="e89f6de809e8" href="/track/e89f6de809e8" />
+    <SideNavLink text="e89f6de809ec" href="/track/e89f6de809ec" />
+    <SideNavLink text="e89f6de809dc" href="/track/e89f6de809dc" />
+  </SideNavItems>
+</SideNav>
 <Content>
   <Grid>
     <Row>

@@ -12,17 +12,13 @@
 	export let data;
 	let /** @type number */ pageSize = 20;
 	let /** @type number */ page = 1;
-	let /** @type number[] */ center =
-			data.scan_logs.length > 0
-				? [data.scan_logs[0].location.lng, data.scan_logs[0].location.lat]
-				: [151.21513681183322, -33.875958176445934];
+	let /** @type number[] */ center;
+	$: center =
+		data.scan_logs.length > 0 && data.scan_logs[0].location != null
+			? [data.scan_logs[0].location.lng, data.scan_logs[0].location.lat]
+			: [151.21513681183322, -33.875958176445934];
 
-	let /** @type number | undefined */ minX = undefined;
-	let /** @type number | undefined */ minY = undefined;
-	let /** @type number | undefined */ maxX = undefined;
-	let /** @type number | undefined */ maxY = undefined;
-
-	onMount(() => {
+	const render = () => {
 		mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 		const map = new mapboxgl.Map({
 			container: 'map', // container ID
@@ -32,7 +28,11 @@
 		});
 
 		const /** @type number[][] */ coordinates = new Array();
-
+		// console.log(data.scan_logs);
+		let /** @type number | undefined */ minX = undefined;
+		let /** @type number | undefined */ minY = undefined;
+		let /** @type number | undefined */ maxX = undefined;
+		let /** @type number | undefined */ maxY = undefined;
 		for (var i = 0; i < data.scan_logs.length; i++) {
 			if (data.scan_logs[i].location === null) {
 				continue;
@@ -70,13 +70,18 @@
 
 		data.scan_logs.forEach((/** @type any */ log) => {
 			if (log.location != null) {
-				const desc = `Timestamp: ${moment.parseZone(log.timestamp, "YYYY-MM-DDTHH:mm:ssZ").local().format("YYYY-MM-DD HH:mm:ss ZZ")} ${log.location === null ? '--'
-								: '<br/>Coordinates: [' + log.location.lat + ',' + log.location.lng + ']</br>'}`
+				const desc = `Timestamp: ${moment
+					.parseZone(log.timestamp, 'YYYY-MM-DDTHH:mm:ssZ')
+					.local()
+					.format('YYYY-MM-DD HH:mm:ss ZZ')} ${
+					log.location === null
+						? '--'
+						: '<br/>Coordinates: [' + log.location.lat + ',' + log.location.lng + ']</br>'
+				}`;
 				routedata.data.features.push({
 					type: 'Feature',
 					properties: {
 						description: desc
-							
 					},
 					geometry: {
 						type: 'Point',
@@ -145,7 +150,16 @@
 			],
 			{ padding: 40 }
 		);
+	};
+	let mapInit = false;
+	onMount(() => {
+		mapInit = true;
 	});
+	$: {
+		if (mapInit && data) {
+			render();
+		}
+	}
 </script>
 
 <Grid>
