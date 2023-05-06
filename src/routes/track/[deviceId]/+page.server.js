@@ -15,7 +15,6 @@ export const load = async ({ params, fetch }) => {
 
 	const client = ddbClient;
 	const start_time = moment().utc().subtract(3, 'days');
-	console.log(start_time.toISOString());
 	const parameters = {
 		TableName: 'kegcat-dev-eu',
 		KeyConditionExpression: 'id = :mac AND #c >= :s',
@@ -85,7 +84,6 @@ export const load = async ({ params, fetch }) => {
 		const val = await redis_client.get(hkey);
 
 		if ( val ) {
-			console.log("REDIS_HIT:", val);
 			return JSON.parse(val);
 		}
 
@@ -99,7 +97,6 @@ export const load = async ({ params, fetch }) => {
 			return result;
 		} else {
 			redis_client.set(hkey, '{}');
-			console.log(res.statusText)
 			return null;
 		}
 	};

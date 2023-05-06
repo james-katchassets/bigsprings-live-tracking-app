@@ -160,7 +160,7 @@
 			render();
 		}
 	}
-	console.log(data.monit_logs);
+	// console.log(data.monit_logs);
 </script>
 
 <Grid narrow>
