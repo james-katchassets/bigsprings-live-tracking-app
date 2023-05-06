@@ -57,8 +57,7 @@ export const load = async ({ params, fetch }) => {
 			port: 14990
 		}
 	});
-	await redis_client.connect();
-
+	
 	const endpoint = `https://positioning.hereapi.com/v2/locate?apiKey=${MY_HEREMAPS_API_KEY}`;
 	const positioning = async ( /** @type {{ id: string, timestamp: string,  scan_results: { bssid: string; rssi: number; channel: number; ssid: string }[]; }} */ msg) => {
 		// const gbody = {
@@ -99,6 +98,7 @@ export const load = async ({ params, fetch }) => {
 			redis_client.set(hkey, JSON.stringify(result));
 			return result;
 		} else {
+			redis_client.set(hkey, '{}');
 			console.log(res.statusText)
 			return null;
 		}
@@ -135,19 +135,20 @@ export const load = async ({ params, fetch }) => {
 	const delay = (/** @type number */ time) => {
 		return new Promise(resolve => setTimeout(resolve, time));
 	};
-
+	
 	const keys = Array.from(tempTx.keys());
+	await redis_client.connect();
 	for (let i of keys) {
 		const v = tempTx.get(i);
 		const loc = await positioning(v);
-		if (loc != null) {
+		if (loc != null && JSON.stringify(loc) !== '{}') {
 			v.location = loc.location;
 		} else {
 			v.location = null
 		}
 		scan_logs.push(v);
 	}
-
+	redis_client.disconnect();
 	// tempTx.forEach( async (v, k) => {
 	// 	const loc = await positioning(v);
 	// 	if ( loc != null ) {
@@ -157,7 +158,6 @@ export const load = async ({ params, fetch }) => {
 	// 	}
 	// 	scan_logs.push(v);
 	// });
-	redis_client.disconnect();
 	return {
 		monit_logs: monit_logs,
 		scan_logs: scan_logs,

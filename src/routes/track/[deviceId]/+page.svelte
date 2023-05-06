@@ -1,7 +1,7 @@
 <script>
 	// /** @type { import("./$types").PageData }*/
 	// export let data;
-
+	import { page } from '$app/stores';
 	import { Column, DataTable, Grid, Pagination, Row } from 'carbon-components-svelte';
 	import moment from 'moment';
 	import mapboxgl from 'mapbox-gl';
@@ -10,8 +10,8 @@
 
 	/** @type {import('./$types').PageData}*/
 	export let data;
-	let /** @type number */ pageSize = 20;
-	let /** @type number */ page = 1;
+	// let /** @type number */ pageSize = 20;
+	// let /** @type number */ page = 1;
 	let /** @type number[] */ center;
 	$: center =
 		data.scan_logs.length > 0 && data.scan_logs[0].location != null
@@ -160,6 +160,7 @@
 			render();
 		}
 	}
+	console.log(data.monit_logs);
 </script>
 
 <Grid narrow>
