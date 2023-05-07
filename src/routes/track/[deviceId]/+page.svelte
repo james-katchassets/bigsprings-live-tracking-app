@@ -2,7 +2,7 @@
 	// /** @type { import("./$types").PageData }*/
 	// export let data;
 	import { page } from '$app/stores';
-	import { Column, DataTable, Grid, Pagination, Row } from 'carbon-components-svelte';
+	import { Column, DataTable, Grid, Pagination, Row, Tag } from 'carbon-components-svelte';
 	import moment from 'moment';
 	import mapboxgl from 'mapbox-gl';
 	import { onMount } from 'svelte';
@@ -51,6 +51,12 @@
 				maxY = data.scan_logs[i].location.lat;
 			}
 		}
+
+		if ( coordinates.length == 0 ) {
+			console.log("No coordinate found");
+			return;
+		}
+
 		const routedata = {
 			type: 'geojson',
 			data: {
@@ -156,14 +162,16 @@
 		mapInit = true;
 	});
 	$: {
-		if (mapInit && data) {
+		if (mapInit && data && data.scan_logs.length > 0 ) {
 			render();
 		}
 	}
+	console.log(data.scan_logs);
 	// console.log(data.monit_logs);
 </script>
 
 <Grid narrow>
+	<Row><Column><h4>Device ID: <Tag type="cyan">{data.device_id}</Tag></h4></Column></Row>
 	<Row>
 		<Column>
 			<div id="map" style="min-height:500px;min-width:600px;" />

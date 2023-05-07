@@ -3,6 +3,7 @@ import { ddbClient } from '$lib/ddbclient';
 import moment from 'moment';
 import { QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { createClient } from 'redis';
+import { positioning, revgeocoding } from '$lib/heremaps';
 import md5 from 'blueimp-md5';
 
 
@@ -49,7 +50,7 @@ export const load = async ({ params, fetch }) => {
 
 
 
-	const redis_client = createClient({
+	const /** @type {import("@redis/client").RedisClientType} */ redis_client = createClient({
 		password: MY_REDIS_PASSWORD,
 		socket: {
 			host: 'redis-14990.c291.ap-southeast-2-1.ec2.cloud.redislabs.com',
@@ -57,49 +58,7 @@ export const load = async ({ params, fetch }) => {
 		}
 	});
 	
-	const endpoint = `https://positioning.hereapi.com/v2/locate?apiKey=${MY_HEREMAPS_API_KEY}`;
-	const positioning = async ( /** @type {{ id: string, timestamp: string,  scan_results: { bssid: string; rssi: number; channel: number; ssid: string }[]; }} */ msg) => {
-		// const gbody = {
-		// 	considerIp: "false",
-		// 	"wifiAccessPoints": msg.scan_results.map((/** @type {{ bssid: string; rssi: Number; channel: number; ssid: string}} */ result) => {
-		// 		return {
-		// 			"macAddress": result.bssid,
-		// 			"signalStrength": result.rssi,
-		// 			"channel": result.channel,
-		// 			"age": moment().valueOf() - moment(msg.timestamp).valueOf()
-		// 		}
-		// 	})
-		// }
-		// console.log("gmap", gbody);
-		const body = {
-			"wlan": msg.scan_results.map((/** @type {{ bssid: string; rssi: Number; channel: number; ssid: string}} */ result) => {
-				return {
-					"mac": result.bssid,
-					"rss": result.rssi
-				}
-			})
-		}
-
-		const hkey = md5(JSON.stringify(body));
-		const val = await redis_client.get(hkey);
-
-		if ( val ) {
-			return JSON.parse(val);
-		}
-
-		// console.log("Heremaps", body);
-		const headers = new Headers();
-		headers.append("Content-Type", "application/json");
-		const res = await fetch(endpoint, { headers: headers, method: "POST", body: JSON.stringify(body) })
-		if (res.status == 200) {
-			const result =  await res.json();
-			redis_client.set(hkey, JSON.stringify(result));
-			return result;
-		} else {
-			redis_client.set(hkey, '{}');
-			return null;
-		}
-	};
+	
 	/** @type  { Map<number, any> } */
 	let tempTx = new Map();
 
@@ -137,25 +96,22 @@ export const load = async ({ params, fetch }) => {
 	await redis_client.connect();
 	for (let i of keys) {
 		const v = tempTx.get(i);
-		const loc = await positioning(v);
+		const loc = await positioning(v, redis_client);
 		if (loc != null && JSON.stringify(loc) !== '{}') {
 			v.location = loc.location;
+			const places = await revgeocoding(loc, redis_client);
+			v.places = places;
 		} else {
 			v.location = null
 		}
 		scan_logs.push(v);
 	}
-	redis_client.disconnect();
-	// tempTx.forEach( async (v, k) => {
-	// 	const loc = await positioning(v);
-	// 	if ( loc != null ) {
-	// 		v.location = loc.location;
-	// 	} else {
-	// 		v.location = null
-	// 	}
-	// 	scan_logs.push(v);
-	// });
+	redis_client.quit();
+	
+
+
 	return {
+		device_id: params.deviceId,
 		monit_logs: monit_logs,
 		scan_logs: scan_logs,
 		reset_logs: reset_logs
