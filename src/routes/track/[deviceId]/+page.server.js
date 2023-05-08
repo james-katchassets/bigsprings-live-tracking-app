@@ -57,8 +57,8 @@ export const load = async ({ params, fetch }) => {
 			port: 14990
 		}
 	});
-	
-	
+
+
 	/** @type  { Map<number, any> } */
 	let tempTx = new Map();
 
@@ -91,7 +91,7 @@ export const load = async ({ params, fetch }) => {
 	const delay = (/** @type number */ time) => {
 		return new Promise(resolve => setTimeout(resolve, time));
 	};
-	
+
 	const keys = Array.from(tempTx.keys());
 	await redis_client.connect();
 	for (let i of keys) {
@@ -107,12 +107,87 @@ export const load = async ({ params, fetch }) => {
 		scan_logs.push(v);
 	}
 	redis_client.quit();
-	
 
+
+	/**
+	 * @type {{group: string, date: string, key?: string, value: string | number }[]}
+	 */
+	let chart_data = [];
+	// console.log(monit_logs);
+
+	/**
+	 * @type {undefined | boolean }
+	 */
+	let lastTilt = undefined;
+	/**
+	 * @type {undefined | boolean }
+	 */
+	let lastMove = undefined;
+	/**
+	 * @type {undefined | string }
+	 */
+	let lastOrientation = undefined;
+
+	monit_logs.forEach((monit) => {
+		for (let entry of monit.entries) {
+			const secs = Math.round(moment(entry.timestamp).valueOf() / 1000 / 15) * 1000 * 15;
+			const ts = moment(secs).toISOString();
+			chart_data.push({
+				group: "Temperature",
+				date: ts,
+				key: "--",
+				value: entry.temperature,
+			});
+			if (lastOrientation !== entry.orientation) {
+				chart_data.push({
+					group: "Orientation",
+					date: ts,
+					key: entry.orientation,
+					value: entry.orientation
+				});
+			}
+
+			if (entry.tilted) {
+				if (lastTilt === entry.tilted) {
+					chart_data.push({
+						group: "Tilt",
+						date: ts,
+						key: "tilted",
+						value: "tilted"
+					});
+				}
+			}
+			if (entry.moved) {
+				if (lastMove === entry.moved) {
+					chart_data.push({
+						group: "Movement",
+						date: ts,
+						key: "moved",
+						value: "moved"
+					});
+				}
+			}
+			lastTilt = entry.tilted;
+			lastMove = entry.moved;
+			lastOrientation = entry.orientation;
+		}
+	});
+
+	const compareTimestamp = ( /** @type {{ date: moment.MomentInput; }} */ a, /** @type {{ date: moment.MomentInput; }} */ b) => {
+		if (moment.parseZone(a.date).isBefore(moment.parseZone(b.date))) {
+			return -1;
+		}
+		if (moment.parseZone(a.date).isAfter(moment.parseZone(b.date))) {
+			return 1;
+		}
+		return 0;
+	}
+
+	chart_data = chart_data.sort(compareTimestamp);
 
 	return {
 		device_id: params.deviceId,
-		monit_logs: monit_logs,
+		chart_data: chart_data,
 		scan_logs: scan_logs,
 		reset_logs: reset_logs
 	}

@@ -1,4 +1,6 @@
 <script>
+  import '@carbon/styles/css/styles.css';
+  import '@carbon/charts/styles.css';
   import 'carbon-components-svelte/css/white.css';
   import {
     Header,

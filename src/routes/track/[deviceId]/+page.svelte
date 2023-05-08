@@ -173,7 +173,6 @@
 	// console.log(data.scan_logs);
 	// console.log(data.monit_logs);
 	
-	/** type { import('@carbon/charts/interfaces').ComboChartOptions } */
 	const options = {
 			title: 'Temperature & Movement Detection',
 			axes: {
@@ -183,7 +182,7 @@
 					correspondingDatasets: ['Temperature']
 				},
 				bottom: {
-					scaleType: 'time',
+					scaleType:  'time',
 					mapsTo: 'date'
 				},
 				right: {
