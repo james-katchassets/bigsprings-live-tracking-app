@@ -1,5 +1,6 @@
 <script>
 	import { Column, DataTable, Grid, Pagination, Row, Tag } from 'carbon-components-svelte';
+	import { ScaleTypes } from '@carbon/charts/interfaces/enums'
 	import { ComboChart } from '@carbon/charts-svelte';
 	import moment from 'moment';
 	import mapboxgl from 'mapbox-gl';
@@ -182,16 +183,18 @@
 					correspondingDatasets: ['Temperature']
 				},
 				bottom: {
-					scaleType:  'time',
+					/** @type { ScaleTypes }*/
+					scaleType:  ScaleTypes.TIME,
 					mapsTo: 'date'
 				},
 				right: {
 					title: 'Detection',
 					mapsTo: 'key',
 					ticks: {
-						values: ['upright', 'unknown', 'moved', 'upside_down']
+						values: ['upside_down', 'unknown', 'upright', 'moved', 'tilted']
 					},
-					scaleType: 'labels',
+					/** @type { ScaleTypes }*/
+					scaleType: ScaleTypes.LABELS,
 					correspondingDatasets: ['Orientation', 'Tilt', 'Movement']
 				}
 			},
