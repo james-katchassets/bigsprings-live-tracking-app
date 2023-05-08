@@ -1,8 +1,6 @@
 <script>
-	// /** @type { import("./$types").PageData }*/
-	// export let data;
-	import { page } from '$app/stores';
 	import { Column, DataTable, Grid, Pagination, Row, Tag } from 'carbon-components-svelte';
+	import { ComboChart } from '@carbon/charts-svelte';
 	import moment from 'moment';
 	import mapboxgl from 'mapbox-gl';
 	import { onMount } from 'svelte';
@@ -52,8 +50,8 @@
 			}
 		}
 
-		if ( coordinates.length == 0 ) {
-			console.log("No coordinate found");
+		if (coordinates.length == 0) {
+			console.log('No coordinate found');
 			return;
 		}
 
@@ -77,8 +75,11 @@
 		data.scan_logs.forEach((/** @type any */ log) => {
 			if (log.location != null) {
 				const desc = `Timestamp: ${moment
+
 					.parseZone(log.timestamp, 'YYYY-MM-DDTHH:mm:ssZ')
+
 					.local()
+
 					.format('YYYY-MM-DD HH:mm:ss ZZ')} ${
 					log.location === null
 						? '--'
@@ -154,7 +155,9 @@
 				[minX, minY],
 				[maxX, maxY]
 			],
-			{ padding: 40 }
+			{
+				padding: 40
+			}
 		);
 	};
 	let mapInit = false;
@@ -162,48 +165,137 @@
 		mapInit = true;
 	});
 	$: {
-		if (mapInit && data && data.scan_logs.length > 0 ) {
+		if (mapInit && data && data.scan_logs.length > 0) {
 			render();
 		}
 	}
-	console.log(data.scan_logs);
+	// console.log(data.chart_data);
+	// console.log(data.scan_logs);
 	// console.log(data.monit_logs);
+	
+	/** type { import('@carbon/charts/interfaces').ComboChartOptions } */
+	const options = {
+			title: 'Temperature & Movement Detection',
+			axes: {
+				left: {
+					mapsTo: 'value',
+					title: 'Temperature',
+					correspondingDatasets: ['Temperature']
+				},
+				bottom: {
+					scaleType: 'time',
+					mapsTo: 'date'
+				},
+				right: {
+					title: 'Detection',
+					mapsTo: 'key',
+					ticks: {
+						values: ['upright', 'unknown', 'moved', 'upside_down']
+					},
+					scaleType: 'labels',
+					correspondingDatasets: ['Orientation', 'Tilt', 'Movement']
+				}
+			},
+			timeScale: {
+				addSpaceOnEdges: 0,
+				timeIntervalFormats: {
+					hourly: {
+						primary: 'd-MMM, h:mm',
+						secondary: 'HH:mm'
+					}
+				}
+			},
+			curve: 'curveMonotoneX',
+			comboChartTypes: [
+				{
+					type: 'line',
+					options: {
+						points: {
+							enabled: false
+						}
+					},
+					correspondingDatasets: ['Temperature']
+				},
+				{
+					type: 'scatter',
+					options: {
+						points: {
+							radius: 2
+						}
+					},
+					correspondingDatasets: ['Orientation', 'Movement', 'Tilt']
+				}
+			],
+			height: '400px'
+		};
 </script>
 
 <Grid narrow>
 	<Row><Column><h4>Device ID: <Tag type="cyan">{data.device_id}</Tag></h4></Column></Row>
 	<Row>
 		<Column>
-			<div id="map" style="min-height:500px;min-width:600px;" />
+			<div id="map" style="min-height:500px;" />
+		</Column>
+	</Row>
+	<Row>
+		<Column>
+			<ComboChart data={data.chart_data} {options} />
 		</Column>
 	</Row>
 	<!-- <Row>
-		<Column>
-			<DataTable
-				title="Travel Logs"
-				sortable
-				headers={[
-					{ key: 'timestamp', value: 'Timestamp', display: (ts) => moment(ts).format() },
-					{ key: 'lat', value: 'Latitude' },
-					{ key: 'lng', value: 'Longitude' },
-					{ key: 'speed', value: 'Speed (km/h)' }
-				]}
-				{pageSize}
-				{page}
-				rows={Array.from(data.logs, (v, i) => ({
-					id: v.timestamp_msec,
-					timestamp: v.timestamp_msec,
-					lat: v.lat,
-					lng: v.lng,
-					speed: v.speed
-				}))}
-			/>
-			<Pagination
-				bind:pageSize
-				bind:page
-				totalItems={data.logs.length}
-				pageSizeInputDisabled
-			/></Column
-		>
-	</Row> -->
+
+<Column>
+
+<DataTable
+
+title="Travel Logs"
+
+sortable
+
+headers={[
+
+{ key: 'timestamp', value: 'Timestamp', display: (ts) => moment(ts).format() },
+
+{ key: 'lat', value: 'Latitude' },
+
+{ key: 'lng', value: 'Longitude' },
+
+{ key: 'speed', value: 'Speed (km/h)' }
+
+]}
+
+{pageSize}
+
+{page}
+
+rows={Array.from(data.logs, (v, i) => ({
+
+id: v.timestamp_msec,
+
+timestamp: v.timestamp_msec,
+
+lat: v.lat,
+
+lng: v.lng,
+
+speed: v.speed
+
+}))}
+
+/>
+
+<Pagination
+
+bind:pageSize
+
+bind:page
+
+totalItems={data.logs.length}
+
+pageSizeInputDisabled
+
+/></Column
+
+>
+            </Row> -->
 </Grid>
