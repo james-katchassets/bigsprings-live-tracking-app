@@ -236,7 +236,7 @@
 	<Row><Column><h4>Device ID: <Tag type="cyan">{data.device_id}</Tag></h4></Column></Row>
 	<Row>
 		<Column>
-			<div id="map" style="min-height:500px;" />
+			<div id="map" style="min-height:400px;min-width:300px;" />
 		</Column>
 	</Row>
 	<Row>
