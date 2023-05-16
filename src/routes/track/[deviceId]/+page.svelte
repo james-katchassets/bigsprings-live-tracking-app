@@ -1,6 +1,6 @@
 <script>
 	import { Column, DataTable, Grid, Pagination, Row, Tag } from 'carbon-components-svelte';
-	import { ScaleTypes } from '@carbon/charts/interfaces/enums';
+	// import { ScaleTypes } from '@carbon/charts/interfaces/enums';
 	import { ComboChart } from '@carbon/charts-svelte';
 	import moment from 'moment';
 	import mapboxgl from 'mapbox-gl';
@@ -185,7 +185,8 @@
 				correspondingDatasets: ['Temperature']
 			},
 			bottom: {
-				scaleType: 'time',
+				
+				scaleType: /** @type { import("@carbon/charts/interfaces/enums").ScaleTypes } */ ( 'time' ),
 				mapsTo: 'date'
 			},
 			right: {
@@ -194,7 +195,7 @@
 				ticks: {
 					values: ['upside_down', 'unknown', 'upright', 'moved', 'tilted']
 				},
-				scaleType:  'labels',
+				scaleType:  /** @type { import("@carbon/charts/interfaces/enums").ScaleTypes } */ ( 'labels' ),
 				correspondingDatasets: ['Orientation', 'Tilt', 'Movement']
 			}
 		},
