@@ -1,11 +1,13 @@
 <script>
 	import { Column, DataTable, Grid, Pagination, Row, Tag } from 'carbon-components-svelte';
-	import { ScaleTypes } from '@carbon/charts/interfaces/enums'
+	import { ScaleTypes } from '@carbon/charts/interfaces/enums';
 	import { ComboChart } from '@carbon/charts-svelte';
 	import moment from 'moment';
 	import mapboxgl from 'mapbox-gl';
 	import { onMount } from 'svelte';
 	import 'mapbox-gl/dist/mapbox-gl.css';
+	import '@carbon/charts/styles.css';
+
 
 	/** @type {import('./$types').PageData}*/
 	export let data;
@@ -183,7 +185,6 @@
 					correspondingDatasets: ['Temperature']
 				},
 				bottom: {
-					/** @type { ScaleTypes }*/
 					scaleType:  ScaleTypes.TIME,
 					mapsTo: 'date'
 				},
@@ -193,7 +194,6 @@
 					ticks: {
 						values: ['upside_down', 'unknown', 'upright', 'moved', 'tilted']
 					},
-					/** @type { ScaleTypes }*/
 					scaleType: ScaleTypes.LABELS,
 					correspondingDatasets: ['Orientation', 'Tilt', 'Movement']
 				}

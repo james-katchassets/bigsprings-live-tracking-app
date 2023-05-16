@@ -132,12 +132,14 @@ export const load = async ({ params, fetch }) => {
 		for (let entry of monit.entries) {
 			const secs = Math.round(moment(entry.timestamp).valueOf() / 1000 / 15) * 1000 * 15;
 			const ts = moment(secs).toISOString();
-			chart_data.push({
-				group: "Temperature",
-				date: ts,
-				key: "--",
-				value: entry.temperature,
-			});
+			if (entry.temperature > -120) {
+				chart_data.push({
+					group: "Temperature",
+					date: ts,
+					key: "--",
+					value: entry.temperature,
+				});
+			}
 			if (lastOrientation !== entry.orientation) {
 				chart_data.push({
 					group: "Orientation",
