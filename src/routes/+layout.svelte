@@ -16,23 +16,23 @@
 	SideNavLink,
   } from "carbon-components-svelte";
 	import { goto } from '$app/navigation';
+  
 
   let isSideNavOpen = false;
 </script>
 
-<Header company="Katch Assets" platformName="Live Tracking" bind:isSideNavOpen>
+<Header company="Katch Assets" platformName="Live Tracking" bind:isSideNavOpen persistentHamburgerMenu={true}>
   <svelte:fragment slot="skip-to-content">
     <SkipToContent />
   </svelte:fragment>
 </Header>
-<SideNav bind:isOpen={isSideNavOpen}>
+<SideNav bind:isOpen={isSideNavOpen} fixed >
   <SideNavItems>
-    <!-- <SideNavLink text="e89f6de809f4" href="/track/e89f6de809f4" /> -->
-    <SideNavLink text="e89f6de809f4" href="#" on:click={ () => { goto("/track/e89f6de809f4"); isSideNavOpen = false; } } />
-    <SideNavLink text="e89f6de809f8" href="#" on:click={ () => { goto("/track/e89f6de809f8"); isSideNavOpen = false; } } />
-    <SideNavLink text="e89f6de809e8" href="#" on:click={ () => { goto("/track/e89f6de809e8"); isSideNavOpen = false; } } />
-    <SideNavLink text="e89f6de809ec" href="#" on:click={ () => { goto("/track/e89f6de809ec"); isSideNavOpen = false; } } />
-    <SideNavLink text="e89f6de809dc" href="#" on:click={ () => { goto("/track/e89f6de809dc"); isSideNavOpen = false; } } />
+    <SideNavLink text="e89f6de809f4" href="#" on:click={ () => { goto("/track/e89f6de809f4"); isSideNavOpen = false;} } />
+    <SideNavLink text="e89f6de809f8" href="#" on:click={ () => { goto("/track/e89f6de809f8"); isSideNavOpen = false;} } />
+    <SideNavLink text="e89f6de809e8" href="#" on:click={ () => { goto("/track/e89f6de809e8"); isSideNavOpen = false;} } />
+    <SideNavLink text="e89f6de809ec" href="#" on:click={ () => { goto("/track/e89f6de809ec"); isSideNavOpen = false;} } />
+    <SideNavLink text="e89f6de809dc" href="#" on:click={ () => { goto("/track/e89f6de809dc"); isSideNavOpen = false;} } />
   </SideNavItems>
 </SideNav>
 <Content>

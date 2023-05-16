@@ -8,7 +8,6 @@
 	import 'mapbox-gl/dist/mapbox-gl.css';
 	import '@carbon/charts/styles.css';
 
-
 	/** @type {import('./$types').PageData}*/
 	export let data;
 	// let /** @type number */ pageSize = 20;
@@ -165,71 +164,72 @@
 	};
 	let mapInit = false;
 	onMount(() => {
-		mapInit = true;
+		// mapInit = true;
+		render();
 	});
-	$: {
-		if (mapInit && data && data.scan_logs.length > 0) {
-			render();
-		}
-	}
+	// $: {
+	// 	if (mapInit && data && data.scan_logs.length > 0) {
+	// 		render();
+	// 	}
+	// }
 	// console.log(data.chart_data);
 	// console.log(data.scan_logs);
 	// console.log(data.monit_logs);
-	
+
 	const options = {
-			title: 'Temperature & Movement Detection',
-			axes: {
-				left: {
-					mapsTo: 'value',
-					title: 'Temperature',
-					correspondingDatasets: ['Temperature']
-				},
-				bottom: {
-					scaleType:  ScaleTypes.TIME,
-					mapsTo: 'date'
-				},
-				right: {
-					title: 'Detection',
-					mapsTo: 'key',
-					ticks: {
-						values: ['upside_down', 'unknown', 'upright', 'moved', 'tilted']
-					},
-					scaleType: ScaleTypes.LABELS,
-					correspondingDatasets: ['Orientation', 'Tilt', 'Movement']
-				}
+		title: 'Temperature & Movement Detection',
+		axes: {
+			left: {
+				mapsTo: 'value',
+				title: 'Temperature',
+				correspondingDatasets: ['Temperature']
 			},
-			timeScale: {
-				addSpaceOnEdges: 0,
-				timeIntervalFormats: {
-					hourly: {
-						primary: 'd-MMM, h:mm',
-						secondary: 'HH:mm'
+			bottom: {
+				scaleType: 'time',
+				mapsTo: 'date'
+			},
+			right: {
+				title: 'Detection',
+				mapsTo: 'key',
+				ticks: {
+					values: ['upside_down', 'unknown', 'upright', 'moved', 'tilted']
+				},
+				scaleType:  'labels',
+				correspondingDatasets: ['Orientation', 'Tilt', 'Movement']
+			}
+		},
+		timeScale: {
+			addSpaceOnEdges: 0,
+			timeIntervalFormats: {
+				hourly: {
+					primary: 'd-MMM, h:mm',
+					secondary: 'HH:mm'
+				}
+			}
+		},
+		curve: 'curveMonotoneX',
+		comboChartTypes: [
+			{
+				type: 'line',
+				options: {
+					points: {
+						enabled: false
 					}
-				}
-			},
-			curve: 'curveMonotoneX',
-			comboChartTypes: [
-				{
-					type: 'line',
-					options: {
-						points: {
-							enabled: false
-						}
-					},
-					correspondingDatasets: ['Temperature']
 				},
-				{
-					type: 'scatter',
-					options: {
-						points: {
-							radius: 2
-						}
-					},
-					correspondingDatasets: ['Orientation', 'Movement', 'Tilt']
-				}
-			],
-			height: '400px'
-		};
+				correspondingDatasets: ['Temperature']
+			},
+			{
+				type: 'scatter',
+				options: {
+					points: {
+						radius: 2
+					}
+				},
+				correspondingDatasets: ['Orientation', 'Movement', 'Tilt']
+			}
+		],
+		height: '400px'
+	};
 </script>
 
 <Grid narrow>
@@ -241,7 +241,9 @@
 	</Row>
 	<Row>
 		<Column>
+			{#if data.chart_data != undefined }
 			<ComboChart data={data.chart_data} {options} />
+			{/if}
 		</Column>
 	</Row>
 	<!-- <Row>
