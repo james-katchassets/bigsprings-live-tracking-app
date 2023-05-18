@@ -168,7 +168,7 @@
 		render();
 	});
 	$: {
-		if (mapInit && data && data.scan_logs.length > 0) {
+		if (mapInit && data ) {
 			render();
 		}
 	}
