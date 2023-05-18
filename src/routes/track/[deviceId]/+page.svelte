@@ -164,14 +164,14 @@
 	};
 	let mapInit = false;
 	onMount(() => {
-		// mapInit = true;
+		mapInit = true;
 		render();
 	});
-	// $: {
-	// 	if (mapInit && data && data.scan_logs.length > 0) {
-	// 		render();
-	// 	}
-	// }
+	$: {
+		if (mapInit && data && data.scan_logs.length > 0) {
+			render();
+		}
+	}
 	// console.log(data.chart_data);
 	// console.log(data.scan_logs);
 	// console.log(data.monit_logs);
