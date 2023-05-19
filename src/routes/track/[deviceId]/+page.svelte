@@ -10,6 +10,7 @@
 
 	/** @type {import('./$types').PageData}*/
 	export let data;
+	
 	// let /** @type number */ pageSize = 20;
 	// let /** @type number */ page = 1;
 	let /** @type number[] */ center;
@@ -74,6 +75,18 @@
 			}
 		};
 
+		const concatPlaces = (/** @type any[] */ plcs) => {
+			/**
+			 * @type {string[]}
+			 */
+			const result = [];
+			plcs.forEach( (plc) => {
+				result.push(`<li>${plc.title}</li>`)
+			} );
+			return result.join("");
+		};
+
+
 		data.scan_logs.forEach((/** @type any */ log) => {
 			if (log.location != null) {
 				const desc = `Timestamp: ${moment
@@ -85,8 +98,11 @@
 					.format('YYYY-MM-DD HH:mm:ss ZZ')} ${
 					log.location === null
 						? '--'
-						: '<br/>Coordinates: [' + log.location.lat + ',' + log.location.lng + ']</br>'
+						: '<br/>Coordinates: [' + log.location.lat + ',' + log.location.lng + ']<br/>' +
+						( log.places.items.length > 0 ? 'Matched place(s):<br/><ul style="list-style-type: square;list-style-position: inside;">' + concatPlaces(log.places.items) + '</ul>' : ""  )
+
 				}`;
+				// console.log(log.places);
 				routedata.data.features.push({
 					type: 'Feature',
 					properties: {
@@ -97,6 +113,7 @@
 						coordinates: [log.location.lng, log.location.lat]
 					}
 				});
+				console.log(desc);
 			}
 		});
 
@@ -136,7 +153,7 @@
 			map.getCanvas().style.cursor = 'pointer';
 			const coordinates = e.features[0].geometry.coordinates.slice();
 			const description = e.features[0].properties.description;
-
+			console.log(description);
 			// Ensure that if the map is zoomed out such that multiple
 			// copies of the feature are visible, the popup appears
 			// over the copy being pointed to.

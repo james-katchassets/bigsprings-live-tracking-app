@@ -16,22 +16,27 @@ export const load = async ({ params, fetch }) => {
 
 	const client = ddbClient;
 	const start_time = moment().utc().subtract(3, 'days');
-	const parameters = {
-		TableName: 'kegcat-dev-eu',
-		KeyConditionExpression: 'id = :mac AND #c >= :s',
-		ScanIndexForward: false,
-		ExpressionAttributeNames: {
-			'#c': 'timestamp'
-		},
-		ExpressionAttributeValues: {
-			':mac': params.deviceId,
-			':s': start_time.toISOString(),
-		},
-		ProjectionExpression: 'id, #c, battery, config, entries, firmware_version, hardware_version, iccid, imei, message_topic, mobile, scan_results',
-	};
+	let topic = 'scan';
+
 
 	const run = async () => {
 		try {
+			const parameters = {
+				TableName: 'kegcat-dev-eu',
+				KeyConditionExpression: 'id = :mac',
+				ScanIndexForward: false,
+				ExpressionAttributeNames: {
+					'#c': 'timestamp'
+				},
+				FilterExpression: 'message_topic = :t',
+				ExpressionAttributeValues: {
+					':mac': params.deviceId,
+					// ':s': start_time.toISOString(),
+					':t': topic,
+				},
+				Limit: 25,
+				ProjectionExpression: 'id, #c, battery, config, entries, firmware_version, hardware_version, iccid, imei, message_topic, mobile, scan_results',
+			};
 			const data = await client.send(new QueryCommand(parameters));
 			/** @type any */
 			const obj = structuredClone(data.Items);
@@ -40,13 +45,17 @@ export const load = async ({ params, fetch }) => {
 			console.log('Error', err);
 		}
 	};
-	const logs = await run();
-	let monit_logs = [];
-	/**
-	 * @type {any[]}
-	 */
+	// const logs = await run();
+	// console.log(logs);
 	let scan_logs = [];
+	scan_logs = await run();
+	let monit_logs = [];
+	topic = 'monit';
+	monit_logs = await run();
+
 	let reset_logs = [];
+	topic = 'reset';
+	reset_logs = await run();
 
 
 
@@ -62,31 +71,13 @@ export const load = async ({ params, fetch }) => {
 	/** @type  { Map<number, any> } */
 	let tempTx = new Map();
 
-	for (const msg of logs) {
-		switch (msg.message_topic) {
-			case 'monit':
-				monit_logs.push(msg);
-				break;
-			case 'scan':
-				// const loc = await positioning(msg);
-				// if ( loc != null ) {
-				// 	msg.location = loc.location;
-				// } else {
-				// 	msg.location = null;
-				// }
-				// scan_logs.push(msg);
-				/** @type Number */
-				let timestampMsec = moment(msg.timestamp).valueOf();
-				timestampMsec = Math.round(timestampMsec / 1000 / 60 / 5) * 5 * 60;
-				tempTx.set(timestampMsec, msg);
-				break;
-			case 'reset':
-				reset_logs.push(msg);
-				break;
-			default:
-				break;
-		}
+	for (const msg of scan_logs) {
+		let timestampMsec = moment(msg.timestamp).valueOf();
+		timestampMsec = Math.round(timestampMsec / 1000 / 60 / 5) * 5 * 60;
+		tempTx.set(timestampMsec, msg);
 	}
+
+	scan_logs = [];
 
 	const delay = (/** @type number */ time) => {
 		return new Promise(resolve => setTimeout(resolve, time));
@@ -94,6 +85,7 @@ export const load = async ({ params, fetch }) => {
 
 	const keys = Array.from(tempTx.keys());
 	await redis_client.connect();
+
 	for (let i of keys) {
 		const v = tempTx.get(i);
 		const loc = await positioning(v, redis_client);
