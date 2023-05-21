@@ -14,10 +14,14 @@
 	// let /** @type number */ pageSize = 20;
 	// let /** @type number */ page = 1;
 	let /** @type number[] */ center;
-	$: center =
+	$: { 
+		center =
 		data.scan_logs.length > 0 && data.scan_logs[0].location != null
 			? [data.scan_logs[0].location.lng, data.scan_logs[0].location.lat]
 			: [151.21513681183322, -33.875958176445934];
+
+			console.log(data);
+	}
 
 	const render = () => {
 		mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
@@ -113,7 +117,7 @@
 						coordinates: [log.location.lng, log.location.lat]
 					}
 				});
-				console.log(desc);
+				// console.log(desc);
 			}
 		});
 
