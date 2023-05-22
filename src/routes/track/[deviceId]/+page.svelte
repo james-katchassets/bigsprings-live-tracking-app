@@ -10,17 +10,17 @@
 
 	/** @type {import('./$types').PageData}*/
 	export let data;
-	
+
 	// let /** @type number */ pageSize = 20;
 	// let /** @type number */ page = 1;
-	let /** @type number[] */ center;
-	$: { 
+	let /** @type number[] */ center = [151.21513681183322, -33.875958176445934];
+	$: {
 		center =
-		data.scan_logs.length > 0 && data.scan_logs[0].location != null
-			? [data.scan_logs[0].location.lng, data.scan_logs[0].location.lat]
-			: [151.21513681183322, -33.875958176445934];
+			data.scan_logs.length > 0 && data.scan_logs[0].location != null
+				? [data.scan_logs[0].location.lng, data.scan_logs[0].location.lat]
+				: [151.21513681183322, -33.875958176445934];
 
-			console.log(data);
+		console.log(data);
 	}
 
 	const render = () => {
@@ -31,7 +31,6 @@
 			center: center, // starting position [lng, lat]
 			zoom: 9 // starting zoom
 		});
-
 		const /** @type number[][] */ coordinates = new Array();
 		// console.log(data.scan_logs);
 		let /** @type number | undefined */ minX = undefined;
@@ -84,12 +83,11 @@
 			 * @type {string[]}
 			 */
 			const result = [];
-			plcs.forEach( (plc) => {
-				result.push(`<li>${plc.title}</li>`)
-			} );
-			return result.join("");
+			plcs.forEach((plc) => {
+				result.push(`<li>${plc.title}</li>`);
+			});
+			return result.join('');
 		};
-
 
 		data.scan_logs.forEach((/** @type any */ log) => {
 			if (log.location != null) {
@@ -102,9 +100,16 @@
 					.format('YYYY-MM-DD HH:mm:ss ZZ')} ${
 					log.location === null
 						? '--'
-						: '<br/>Coordinates: [' + log.location.lat + ',' + log.location.lng + ']<br/>' +
-						( log.places.items.length > 0 ? 'Matched place(s):<br/><ul style="list-style-type: square;list-style-position: inside;">' + concatPlaces(log.places.items) + '</ul>' : ""  )
-
+						: '<br/>Coordinates: [' +
+						  log.location.lat +
+						  ',' +
+						  log.location.lng +
+						  ']<br/>' +
+						  (log.places.items.length > 0
+								? 'Matched place(s):<br/><ul style="list-style-type: square;list-style-position: inside;">' +
+								  concatPlaces(log.places.items) +
+								  '</ul>'
+								: '')
 				}`;
 				// console.log(log.places);
 				routedata.data.features.push({
@@ -189,7 +194,7 @@
 		render();
 	});
 	$: {
-		if (mapInit && data ) {
+		if (mapInit && data) {
 			render();
 		}
 	}
@@ -206,8 +211,7 @@
 				correspondingDatasets: ['Temperature']
 			},
 			bottom: {
-				
-				scaleType: /** @type { import("@carbon/charts/interfaces/enums").ScaleTypes } */ ( 'time' ),
+				scaleType: /** @type { import("@carbon/charts/interfaces/enums").ScaleTypes } */ ('time'),
 				mapsTo: 'date'
 			},
 			right: {
@@ -216,7 +220,7 @@
 				ticks: {
 					values: ['upside_down', 'unknown', 'upright', 'moved', 'tilted']
 				},
-				scaleType:  /** @type { import("@carbon/charts/interfaces/enums").ScaleTypes } */ ( 'labels' ),
+				scaleType: /** @type { import("@carbon/charts/interfaces/enums").ScaleTypes } */ ('labels'),
 				correspondingDatasets: ['Orientation', 'Tilt', 'Movement']
 			}
 		},
@@ -263,8 +267,8 @@
 	</Row>
 	<Row>
 		<Column>
-			{#if data.chart_data != undefined }
-			<ComboChart data={data.chart_data} {options} />
+			{#if data.chart_data != undefined}
+				<ComboChart data={data.chart_data} {options} />
 			{/if}
 		</Column>
 	</Row>
