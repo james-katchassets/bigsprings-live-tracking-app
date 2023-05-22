@@ -39,6 +39,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@vercel/kv": "^0.2.1",
 		"blueimp-md5": "^2.19.0",
 		"help": "^3.0.2",
 		"redis": "^4.6.6"
