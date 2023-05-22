@@ -73,7 +73,7 @@ export const load = async ({ params, fetch }) => {
 
 	for (const msg of scan_logs) {
 		let timestampMsec = moment(msg.timestamp).valueOf();
-		timestampMsec = Math.round(timestampMsec / 1000 / 60 / 5) * 5 * 60;
+		// timestampMsec = Math.round(timestampMsec / 1000 / 60 / 5) * 5 * 60;
 		tempTx.set(timestampMsec, msg);
 	}
 
