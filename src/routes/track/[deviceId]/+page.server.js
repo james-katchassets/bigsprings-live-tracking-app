@@ -1,10 +1,10 @@
-import { MY_AWS_ACCESS_KEY_ID, MY_AWS_SECRET_ACCESS_KEY, MY_HEREMAPS_API_KEY, MY_REDIS_PASSWORD } from '$env/static/private';
+import { MY_AWS_ACCESS_KEY_ID, MY_AWS_SECRET_ACCESS_KEY } from '$env/static/private';
+import { kv } from '@vercel/kv';
 import { ddbClient } from '$lib/ddbclient';
 import moment from 'moment';
 import { QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { createClient } from 'redis';
 import { positioning, revgeocoding } from '$lib/heremaps';
-import md5 from 'blueimp-md5';
 
 
 /** @type {import('./$types').PageServerLoad} */
@@ -49,6 +49,9 @@ export const load = async ({ params, fetch }) => {
 	// console.log(logs);
 	let scan_logs = [];
 	scan_logs = await run();
+
+
+	/** @type { { message_topic: string, entries: {timestamp: String, temperature: number, orientation: string, tilted: boolean, moved: boolean}[], id: string, battery: number, timestamp: string }[] } */
 	let monit_logs = [];
 	topic = 'monit';
 	monit_logs = await run();
@@ -56,17 +59,6 @@ export const load = async ({ params, fetch }) => {
 	let reset_logs = [];
 	topic = 'reset';
 	reset_logs = await run();
-
-
-
-	const /** @type {import("@redis/client").RedisClientType} */ redis_client = createClient({
-		password: MY_REDIS_PASSWORD,
-		socket: {
-			host: 'redis-14990.c291.ap-southeast-2-1.ec2.cloud.redislabs.com',
-			port: 14990
-		}
-	});
-
 
 	/** @type  { Map<number, any> } */
 	let tempTx = new Map();
@@ -84,21 +76,19 @@ export const load = async ({ params, fetch }) => {
 	};
 
 	const keys = Array.from(tempTx.keys());
-	await redis_client.connect();
 
 	for (let i of keys) {
 		const v = tempTx.get(i);
-		const loc = await positioning(v, redis_client);
+		const loc = await positioning(v, kv);
 		if (loc != null && JSON.stringify(loc) !== '{}') {
 			v.location = loc.location;
-			const places = await revgeocoding(loc, redis_client);
+			const places = await revgeocoding(loc, kv);
 			v.places = places;
 		} else {
 			v.location = null
 		}
 		scan_logs.push(v);
 	}
-	redis_client.quit();
 
 
 	/**
