@@ -17,7 +17,7 @@ export const load = async ({ params, fetch }) => {
 	const client = ddbClient;
 	const start_time = moment().utc().subtract(3, 'days');
 	let topic = 'scan';
-
+	let limit = 30;
 
 	const run = async () => {
 		try {
@@ -34,7 +34,7 @@ export const load = async ({ params, fetch }) => {
 					// ':s': start_time.toISOString(),
 					':t': topic,
 				},
-				Limit: 25,
+				Limit: limit,
 				ProjectionExpression: 'id, #c, battery, config, entries, firmware_version, hardware_version, iccid, imei, message_topic, mobile, scan_results',
 			};
 			const data = await client.send(new QueryCommand(parameters));
@@ -49,6 +49,7 @@ export const load = async ({ params, fetch }) => {
 	// console.log(logs);
 	let scan_logs = [];
 	scan_logs = await run();
+		/** @type { { message_topic: string, entries: {timestamp: String, temperature: number, orientation: string, tilted: boolean, moved: boolean}[], id: string, battery: number, timestamp: string }[] } */
 	let monit_logs = [];
 	topic = 'monit';
 	monit_logs = await run();
@@ -122,8 +123,8 @@ export const load = async ({ params, fetch }) => {
 
 	monit_logs.forEach((monit) => {
 		for (let entry of monit.entries) {
-			const secs = Math.round(moment(entry.timestamp).valueOf() / 1000 / 15) * 1000 * 15;
-			const ts = moment(secs).toISOString();
+			// const secs = Math.round(moment(entry.timestamp).valueOf() / 1000 / 15) * 1000 * 15;
+			const ts = moment(entry.timestamp).toISOString();
 			if (entry.temperature > -120) {
 				chart_data.push({
 					group: "Temperature",

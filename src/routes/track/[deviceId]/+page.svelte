@@ -162,7 +162,6 @@
 			map.getCanvas().style.cursor = 'pointer';
 			const coordinates = e.features[0].geometry.coordinates.slice();
 			const description = e.features[0].properties.description;
-			console.log(description);
 			// Ensure that if the map is zoomed out such that multiple
 			// copies of the feature are visible, the popup appears
 			// over the copy being pointed to.
