@@ -1,9 +1,9 @@
-import { MY_AWS_ACCESS_KEY_ID, MY_AWS_SECRET_ACCESS_KEY } from '$env/static/private';
-import { kv } from '@vercel/kv';
+import { KV_REST_API_TOKEN, KV_REST_API_URL, MY_AWS_ACCESS_KEY_ID, MY_AWS_SECRET_ACCESS_KEY } from '$env/static/private';
+import { createClient } from '@vercel/kv';
 import { ddbClient } from '$lib/ddbclient';
 import moment from 'moment';
 import { QueryCommand } from '@aws-sdk/lib-dynamodb';
-import { createClient } from 'redis';
+// import { createClient } from 'redis';
 import { positioning, revgeocoding } from '$lib/heremaps';
 
 
@@ -17,10 +17,11 @@ export const load = async ({ params, fetch }) => {
 	const client = ddbClient;
 	const start_time = moment().utc().subtract(3, 'days');
 	let topic = 'scan';
-
+	let limit = 100;
 
 	const run = async () => {
 		try {
+			
 			const parameters = {
 				TableName: 'kegcat-dev-eu',
 				KeyConditionExpression: 'id = :mac',
@@ -34,7 +35,7 @@ export const load = async ({ params, fetch }) => {
 					// ':s': start_time.toISOString(),
 					':t': topic,
 				},
-				Limit: 25,
+				Limit: limit,
 				ProjectionExpression: 'id, #c, battery, config, entries, firmware_version, hardware_version, iccid, imei, message_topic, mobile, scan_results',
 			};
 			const data = await client.send(new QueryCommand(parameters));
@@ -48,11 +49,13 @@ export const load = async ({ params, fetch }) => {
 	// const logs = await run();
 	// console.log(logs);
 	let scan_logs = [];
+	limit = 100;
 	scan_logs = await run();
 
 
 	/** @type { { message_topic: string, entries: {timestamp: String, temperature: number, orientation: string, tilted: boolean, moved: boolean}[], id: string, battery: number, timestamp: string }[] } */
 	let monit_logs = [];
+	limit = 25;
 	topic = 'monit';
 	monit_logs = await run();
 
@@ -76,7 +79,10 @@ export const load = async ({ params, fetch }) => {
 	};
 
 	const keys = Array.from(tempTx.keys());
-
+	const kv = createClient({
+		url: KV_REST_API_URL,
+		token: KV_REST_API_TOKEN,
+	});
 	for (let i of keys) {
 		const v = tempTx.get(i);
 		const loc = await positioning(v, kv);
@@ -89,7 +95,6 @@ export const load = async ({ params, fetch }) => {
 		}
 		scan_logs.push(v);
 	}
-
 
 	/**
 	 * @type {{group: string, date: string, key?: string, value: string | number }[]}
