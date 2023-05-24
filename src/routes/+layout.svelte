@@ -14,6 +14,7 @@
 	SideNav,
 	SideNavItems,
 	SideNavLink,
+	SideNavMenu,
   } from "carbon-components-svelte";
 	import { goto } from '$app/navigation';
   
@@ -33,6 +34,10 @@
     <SideNavLink text="e89f6de809e8" href="#" on:click={ () => { goto("/track/e89f6de809e8"); isSideNavOpen = false;} } />
     <SideNavLink text="e89f6de809ec" href="#" on:click={ () => { goto("/track/e89f6de809ec"); isSideNavOpen = false;} } />
     <SideNavLink text="e89f6de809dc" href="#" on:click={ () => { goto("/track/e89f6de809dc"); isSideNavOpen = false;} } />
+      <SideNavMenu text="AU Test" expanded >
+        <SideNavLink text="e89f6de809fc" href="#" on:click={ () => { goto("/track/e89f6de809fc"); isSideNavOpen = false;} } />
+        <SideNavLink text="e89f6de80a04" href="#" on:click={ () => { goto("/track/e89f6de80a04"); isSideNavOpen = false;} } />
+      </SideNavMenu>
   </SideNavItems>
 </SideNav>
 <Content>
