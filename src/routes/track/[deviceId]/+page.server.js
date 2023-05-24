@@ -17,11 +17,7 @@ export const load = async ({ params, fetch }) => {
 	const client = ddbClient;
 	const start_time = moment().utc().subtract(3, 'days');
 	let topic = 'scan';
-<<<<<<< HEAD
-	let limit = 30;
-=======
 	let limit = 100;
->>>>>>> vercel-kv
 
 	const run = async () => {
 		try {
@@ -55,13 +51,9 @@ export const load = async ({ params, fetch }) => {
 	let scan_logs = [];
 	limit = 100;
 	scan_logs = await run();
-<<<<<<< HEAD
-		/** @type { { message_topic: string, entries: {timestamp: String, temperature: number, orientation: string, tilted: boolean, moved: boolean}[], id: string, battery: number, timestamp: string }[] } */
-=======
 
 
 	/** @type { { message_topic: string, entries: {timestamp: String, temperature: number, orientation: string, tilted: boolean, moved: boolean}[], id: string, battery: number, timestamp: string }[] } */
->>>>>>> vercel-kv
 	let monit_logs = [];
 	limit = 25;
 	topic = 'monit';
