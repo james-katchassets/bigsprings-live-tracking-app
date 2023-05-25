@@ -1,6 +1,6 @@
 <script>
 	import { Column, DataTable, Grid, Pagination, Row, Tag } from 'carbon-components-svelte';
-	// import { ScaleTypes } from '@carbon/charts/interfaces/enums';
+	import arrow from '$lib/assets/arrow.png';
 	import { ComboChart } from '@carbon/charts-svelte';
 	import moment from 'moment';
 	import mapboxgl from 'mapbox-gl';
@@ -138,7 +138,7 @@
 				},
 				paint: {
 					'line-color': '#5ab55f',
-					'line-width': 5
+					'line-width': 3
 				}
 			});
 			map.addLayer({
@@ -151,6 +151,26 @@
 				// },
 				filter: ['==', '$type', 'Point']
 			});
+			const url = {arrow};
+			console.log("url:", url);
+			map.loadImage( url.arrow, ( /** @type {any} */ error, /** @type {any} */ image ) => {
+				if ( error ) throw error;
+				map.addImage('arrow', image);
+				map.addLayer({
+					'id': 'arrows',
+					'type': 'symbol',
+					'source': 'route',
+					'layout': {
+						'symbol-placement': 'line',
+						'symbol-spacing': 50,
+						'icon-rotate': -90,
+						'icon-allow-overlap': true,
+						'icon-image': 'arrow',
+						'visibility': 'visible'
+					}
+					});
+				});
+			// });
 		});
 
 		const popup = new mapboxgl.Popup({
