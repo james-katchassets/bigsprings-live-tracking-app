@@ -115,7 +115,8 @@
 				routedata.data.features.push({
 					type: 'Feature',
 					properties: {
-						description: desc
+						description: desc,
+						pos: routedata.data.features.length
 					},
 					geometry: {
 						type: 'Point',
@@ -125,7 +126,7 @@
 				// console.log(desc);
 			}
 		});
-
+		console.log(routedata);
 		map.on('load', () => {
 			map.addSource('route', routedata);
 			map.addLayer({
@@ -145,31 +146,47 @@
 				id: 'locations',
 				type: 'circle',
 				source: 'route',
-				// paint: {
-				// 	'circle-color': ['case', ['==', ['get', 'speed'], 0], '#ff0000', '#00ff00'],
-				// 	'circle-radius': 6
-				// },
+				paint: {
+					'circle-color': ['case', ['==', ['get', 'pos'], 1], '#ff0000', '#000000'],
+					'circle-radius': 6
+				},
 				filter: ['==', '$type', 'Point']
 			});
-			const url = {arrow};
-			console.log("url:", url);
-			map.loadImage( url.arrow, ( /** @type {any} */ error, /** @type {any} */ image ) => {
-				if ( error ) throw error;
+			map.addLayer({
+				id: 'pos_label',
+				type: 'symbol',
+				source: 'route',
+				filter: ['==', '$type', 'Point'],
+				layout: {
+					'text-field': [
+						'number-format',
+						['get', 'pos'],
+						{ 'min-fraction-digits': 0, 'max-fraction-digits': 0 }
+					],
+					'text-offset': [0, 1],
+					'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+					'text-size': 12
+				}
+			});
+
+			const url = { arrow };
+			map.loadImage(url.arrow, (/** @type {any} */ error, /** @type {any} */ image) => {
+				if (error) throw error;
 				map.addImage('arrow', image);
 				map.addLayer({
-					'id': 'arrows',
-					'type': 'symbol',
-					'source': 'route',
-					'layout': {
+					id: 'arrows',
+					type: 'symbol',
+					source: 'route',
+					layout: {
 						'symbol-placement': 'line',
 						'symbol-spacing': 50,
 						'icon-rotate': -90,
 						'icon-allow-overlap': true,
 						'icon-image': 'arrow',
-						'visibility': 'visible'
+						visibility: 'visible'
 					}
-					});
 				});
+			});
 			// });
 		});
 
