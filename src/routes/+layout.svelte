@@ -1,4 +1,11 @@
 <script>
+  //Vercel Analytics
+  import { dev } from '$app/environment';
+  import { inject } from '@vercel/analytics';
+  
+  inject({ mode: dev ? 'development' : 'production' });
+  //End Vercel Analytics
+
   import '@carbon/styles/css/styles.css';
   import 'carbon-components-svelte/css/white.css';
   import {
