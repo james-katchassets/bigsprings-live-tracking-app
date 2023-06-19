@@ -1,4 +1,4 @@
-import { KV_REST_API_TOKEN, KV_REST_API_URL, MY_AWS_ACCESS_KEY_ID, MY_AWS_SECRET_ACCESS_KEY } from '$env/static/private';
+import { KV_PRO_REST_API_TOKEN, KV_PRO_REST_API_URL, MY_AWS_ACCESS_KEY_ID, MY_AWS_SECRET_ACCESS_KEY } from '$env/static/private';
 import { createClient } from '@vercel/kv';
 import { ddbClient } from '$lib/ddbclient';
 import moment from 'moment';
@@ -80,8 +80,8 @@ export const load = async ({ params, fetch }) => {
 
 	const keys = Array.from(tempTx.keys());
 	const kv = createClient({
-		url: KV_REST_API_URL,
-		token: KV_REST_API_TOKEN,
+		url: KV_PRO_REST_API_URL,
+		token: KV_PRO_REST_API_TOKEN,
 	});
 	for (let i of keys) {
 		const v = tempTx.get(i);
